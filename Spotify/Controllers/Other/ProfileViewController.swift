@@ -8,8 +8,9 @@
 import UIKit
 import SDWebImage
 
-class ProfileViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+final class ProfileViewController: UIViewController {
     
+    // MARK: - Properties
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -20,6 +21,8 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private var models = [String]()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Profile"
@@ -28,13 +31,16 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         view.addSubview(tableView)
         fetchProfile()
         view.backgroundColor = .systemBackground
-        
     }
+    
+    // MARK: - Layout
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
     }
+    
+    // MARK: - Helpers
     
     private func fetchProfile(){
         APICaller.shared.getCurrentUserProfile {[weak self] result in
@@ -49,6 +55,7 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             }
         }
     }
+    
     private func updateUI(with model: UserProfile){
         tableView.isHidden = false
         models.append("Full Name: \(model.display_name)")
@@ -83,7 +90,11 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         view.addSubview(label)
         label.center = view.center
     }
-    
+}
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
+
+extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return models.count
     }

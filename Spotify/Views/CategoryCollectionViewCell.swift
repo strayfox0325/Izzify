@@ -9,6 +9,9 @@ import UIKit
 import SDWebImage
 
 class CategoryCollectionViewCell: UICollectionViewCell {
+    
+    // MARK: - Properties
+    
     static let identifier = "CategoryCollectionViewCell"
     
     private let imageView: UIImageView = {
@@ -39,6 +42,8 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         .systemMint
     ]
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.layer.cornerRadius = 8
@@ -57,11 +62,15 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         imageView.image = UIImage(systemName: "music.quarternote.3", withConfiguration: UIImage.SymbolConfiguration(pointSize: 50, weight: .regular))
     }
     
+    // MARK: - Layout
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         label.frame = CGRect(x: 10, y: contentView.height/2, width: contentView.width-20, height: contentView.height/2)
         imageView.frame = CGRect(x: contentView.width/2, y: 10, width: contentView.width/2, height: contentView.height/2)
     }
+    
+    // MARK: - Helpers
     
     func configure(with viewModel: CategoryCollectionViewCellViewModel){
         label.text = viewModel.title

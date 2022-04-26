@@ -9,19 +9,16 @@ import Foundation
 import AVFoundation
 
 final class APICaller{
+    
+    // MARK: - Singleton
+    
     static let shared = APICaller()
     
+    // MARK: - Init
+    
     private init(){}
-    struct Constants {
-        static let baseAPIURL = "https://api.spotify.com/v1/"
-    }
     
-    enum APIError: Error {
-        case failedToGetData
-    }
-    
-    
-    //MARK: Albums
+    //MARK: API
     
     public func getAlbumDetails(for album: Album, completion: @escaping (Result<AlbumDetailsResponse,Error>)->Void){
         createRequest(with: URL(string: Constants.baseAPIURL + "albums/" + album.id), type: .GET){ request in
@@ -74,7 +71,6 @@ final class APICaller{
         }
     }
     
-    //MARK: Playlists
     public func getPlaylistDetails(for playlist: Playlist, completion: @escaping (Result<PlaylistDetailsResponse,Error>)->Void){
         createRequest(with: URL(string:Constants.baseAPIURL + "playlists/" + playlist.id), type: .GET){ request in
             let task = URLSession.shared.dataTask(with: request){ data, _, error in
@@ -112,6 +108,7 @@ final class APICaller{
             task.resume()
         }
     }
+    
     public func createPlaylist(with name: String, completion: @escaping (Bool) -> Void){
         getCurrentUserProfile {[weak self] result in
             switch result{
@@ -129,15 +126,15 @@ final class APICaller{
                             completion(false)
                             return
                         }
-                        do{
-                            let result = try JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed)
-                            if let response = result as? [String : Any], response["id"] as? String != nil{
+                        do {
+                            let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                            if let response = result as? [String: Any], response["id"] as? String != nil {
                                 completion(true)
                             }else{
                                 print("Failed to get ID")
                                 completion(false)
                             }
-                        }catch{
+                        } catch{
                             print(error.localizedDescription)
                             completion(false)
                         }
@@ -149,8 +146,7 @@ final class APICaller{
             }
         }
     }
-    
-    
+
     public func addTrackToPlaylist(track: AudioTrack, playlist: Playlist, completion: @escaping(Bool) -> Void){
         createRequest(
             with: URL(string: Constants.baseAPIURL + "playlists/\(playlist.id)/tracks"),
@@ -221,7 +217,6 @@ final class APICaller{
         }
     }
     
-    //MARK: Profile
     public func getCurrentUserProfile(completion: @escaping (Result<UserProfile,Error>)->Void){
         createRequest(with: URL(string:Constants.baseAPIURL + "me"),
                       type: .GET
@@ -244,8 +239,6 @@ final class APICaller{
         }
     }
     
-    
-    //MARK: Browse
     public func getNewReleases(completion: @escaping ((Result<NewReleasesResponse, Error>))->Void){
         createRequest(with: URL(string:Constants.baseAPIURL + "browse/new-releases?limit=30"), type: .GET){ request in
             let task = URLSession.shared.dataTask(with: request) { data, _, error in
@@ -264,7 +257,6 @@ final class APICaller{
             task.resume()
         }
     }
-    
     
     public func getFeaturedPlaylists(completion: @escaping ((Result<FeaturedPlaylistsResponse, Error>))->Void){
         createRequest(with: URL(string: Constants.baseAPIURL + "browse/featured-playlists?limit=20"), type: .GET){ request in
@@ -326,8 +318,6 @@ final class APICaller{
         }
     }
     
-    //MARK: Category
-    
     public func getCategories(completion: @escaping(Result<[Category],Error>) ->Void){
         createRequest(with: URL(string: Constants.baseAPIURL + "browse/categories?limit=50"), type: .GET){ request in
             let task = URLSession.shared.dataTask(with:request){ data, _, error in
@@ -366,8 +356,6 @@ final class APICaller{
         }
     }
     
-    //MARK: Search
-    
     public func search(with query: String, completion: @escaping (Result<[SearchResult], Error>) -> Void){
         createRequest(with: URL(string: Constants.baseAPIURL + "search?limit=20&type=album,artist,playlist,track&q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"), type: .GET){ request in
             let task = URLSession.shared.dataTask(with: request){ data, _, error in
@@ -393,13 +381,6 @@ final class APICaller{
         }
     }
     
-    //MARK: Private
-    enum HTTPMethod: String{
-        case GET
-        case POST
-        case DELETE
-        case PUT
-    }
     private func createRequest(with url: URL?, type: HTTPMethod, completion: @escaping (URLRequest)->Void){
         AuthManager.shared.withValidToken{token in
             guard let apiURL = url else {
@@ -410,7 +391,6 @@ final class APICaller{
             request.httpMethod = type.rawValue
             request.timeoutInterval = 30
             completion(request)
-            
         }
     }
 }

@@ -9,6 +9,8 @@ import AVFoundation
 import Foundation
 import UIKit
 
+// MARK: - Delegate
+
 protocol PlayerDataSource: AnyObject{
     var songName: String? {get}
     var subtitle: String? {get}
@@ -16,26 +18,33 @@ protocol PlayerDataSource: AnyObject{
 }
 
 final class PlaybackPresenter {
+    
+    // MARK: - Singleton
+    
     static let shared = PlaybackPresenter()
+    
+    // MARK: - Properties
     
     private var track: AudioTrack?
     private var tracks = [AudioTrack]()
-    
     var index = 0
+    
     var currentTrack: AudioTrack? {
         if let track = track, tracks.isEmpty {
             return track
         }
-        else if let player = self.playerQueue, !tracks.isEmpty{
+        else if self.playerQueue != nil, !tracks.isEmpty {
             return tracks[index]
         }
         return nil
     }
     
     var playerVC: PlayerViewController?
-    
     var player: AVPlayer?
     var playerQueue: AVQueuePlayer?
+    
+    // MARK: - Helpers
+    
     func startPlayback(from viewController: UIViewController, track: AudioTrack){
         guard let url = URL(string: track.preview_url ?? "") else{
             return
@@ -54,9 +63,8 @@ final class PlaybackPresenter {
         }
         self.playerVC = vc
     }
+    
     func startPlayback(from viewController: UIViewController, tracks: [AudioTrack]){
-        
-        
         self.tracks = tracks
         self.track = nil
         
@@ -76,8 +84,9 @@ final class PlaybackPresenter {
     }
 }
 
+// MARK: - PlayerViewControllerDelegate
+
 extension PlaybackPresenter: PlayerViewControllerDelegate{
-    
     func didTapBack() {
         if tracks.isEmpty{
             //not a playlist or an album
@@ -91,6 +100,7 @@ extension PlaybackPresenter: PlayerViewControllerDelegate{
             playerQueue?.play()
         }
     }
+    
     func didTapNext() {
         if tracks.isEmpty{
             //not a playlist or an album
@@ -100,14 +110,10 @@ extension PlaybackPresenter: PlayerViewControllerDelegate{
             player.advanceToNextItem()
             index += 1
             print(index)
-            //            let item = player.currentItem
-            //            let items = player.items()
-            //            guard let index = items.firstIndex(where: {$0 == item}) else{
-            //                return nil
-            //            }
             playerVC?.refreshUI()
         }
     }
+    
     func didTapPlayPause() {
         if let player = player{
             if player.timeControlStatus == .playing{
@@ -130,10 +136,13 @@ extension PlaybackPresenter: PlayerViewControllerDelegate{
             player?.volume = value
         }
     }
+    
     func didSlideSlider(_ value: Float) {
         player?.volume = value
     }
 }
+
+// MARK: - PlayerDataSource
 
 extension PlaybackPresenter: PlayerDataSource{
     var songName: String?{

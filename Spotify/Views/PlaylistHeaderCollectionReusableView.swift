@@ -8,12 +8,17 @@
 import UIKit
 import SDWebImage
 
+// MARK: - PlaylistHeaderCollectionReusableViewDelegate
+
 protocol PlaylistHeaderCollectionReusableViewDelegate: AnyObject{
     func PlaylistHeaderCollectionReusableViewDidTapPlayAll(_ header: PlaylistHeaderCollectionReusableView)
 }
-final class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
-    static let identifier = "PlaylistHeaderCollectionReusableView"
+
+class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
     
+    // MARK: - Properties
+    
+    static let identifier = "PlaylistHeaderCollectionReusableView"
     weak var delegate: PlaylistHeaderCollectionReusableViewDelegate?
     
     private let nameLabel: UILabel = {
@@ -56,7 +61,8 @@ final class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
     }()
     
     
-    //MARK: Init
+    // - MARK: Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .systemBackground
@@ -72,10 +78,7 @@ final class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
         fatalError()
     }
     
-    @objc private func didTapPlayAll(){
-        delegate?.PlaylistHeaderCollectionReusableViewDidTapPlayAll(self)
-    }
-    
+    // MARK: - Layout
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -89,6 +92,14 @@ final class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
         
         playAllButton.frame = CGRect(x: width-80, y: height-80, width: 60, height: 60)
     }
+    
+    // MARK: - Actions
+    
+    @objc private func didTapPlayAll(){
+        delegate?.PlaylistHeaderCollectionReusableViewDidTapPlayAll(self)
+    }
+    
+    // MARK: - Helpers
     
     func configure(with viewModel: PlaylistHeaderViewModel){
         nameLabel.text = viewModel.name

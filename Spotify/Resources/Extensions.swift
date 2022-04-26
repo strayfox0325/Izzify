@@ -54,5 +54,4 @@ extension String{
 
 extension Notification.Name{
     static let albumAddedNotification = Notification.Name("albumAddedNotification")
-    
 }

@@ -7,19 +7,21 @@
 
 import UIKit
 
-class PlaylistViewController: UIViewController {
+final class PlaylistViewController: UIViewController {
+    
+    // MARK: - Properties
     
     private let playlist: Playlist
-    
     public var isOwner = false
+    private var viewModels = [RecommendedTrackCellViewModel]()
+    private var tracks = [AudioTrack]()
     
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: {_,_ -> NSCollectionLayoutSection? in
         
         let item = NSCollectionLayoutItem(layoutSize:NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
-        )
-        )
+        ))
         item.contentInsets = NSDirectionalEdgeInsets(top: 1, leading: 2, bottom: 1, trailing: 2)
         let group = NSCollectionLayoutGroup.vertical(
             layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
@@ -35,6 +37,9 @@ class PlaylistViewController: UIViewController {
         return section
     })
     )
+    
+    // MARK: - Init
+    
     init(playlist:Playlist){
         self.playlist = playlist
         super.init(nibName: nil, bundle: nil)
@@ -44,17 +49,15 @@ class PlaylistViewController: UIViewController {
         fatalError()
     }
     
-    private var viewModels = [RecommendedTrackCellViewModel]()
-    private var tracks = [AudioTrack]()
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = playlist.name
         view.backgroundColor = .systemBackground
-        
         view.addSubview(collectionView)
         collectionView.register(RecommendedTracksCollectionViewCell.self,forCellWithReuseIdentifier: RecommendedTracksCollectionViewCell.identifier)
-        
         collectionView.register(PlaylistHeaderCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PlaylistHeaderCollectionReusableView.identifier)
         collectionView.backgroundColor = .systemBackground
         collectionView.delegate = self
@@ -82,6 +85,8 @@ class PlaylistViewController: UIViewController {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(_:)))
         collectionView.addGestureRecognizer(gesture)
     }
+    
+    // MARK: - Actions
     
     @objc func didLongPress(_ gesture: UILongPressGestureRecognizer){
         guard gesture.state == .began else{
@@ -132,18 +137,22 @@ class PlaylistViewController: UIViewController {
     }
 }
 
+// MARK: - UICollectionViewDelegate,UICollectionViewDataSource
+
 extension PlaylistViewController: UICollectionViewDelegate,UICollectionViewDataSource {
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModels.count
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecommendedTracksCollectionViewCell.identifier, for: indexPath) as? RecommendedTracksCollectionViewCell else{
             return UICollectionViewCell()
         }
-        
         cell.configure(with: viewModels[indexPath.row])
         return cell
     }
@@ -167,6 +176,8 @@ extension PlaylistViewController: UICollectionViewDelegate,UICollectionViewDataS
         PlaybackPresenter.shared.startPlayback(from: self, track: track)
     }
 }
+
+// MARK: - PlaylistHeaderCollectionReusableViewDelegate
 
 extension PlaylistViewController: PlaylistHeaderCollectionReusableViewDelegate{
     func PlaylistHeaderCollectionReusableViewDidTapPlayAll(_ header: PlaylistHeaderCollectionReusableView) {

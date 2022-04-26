@@ -7,21 +7,19 @@
 
 import UIKit
 
-
-struct SearchSection{
-    let title: String
-    let sections: [SearchResult]
-}
+// MARK: - SearchResultsViewControllerDelegate
 
 protocol SearchResultsViewControllerDelegate: AnyObject{
     func didTapResult(_result: SearchResult)
 }
 
-class SearchResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+final class SearchResultsViewController: UIViewController {
     
+    // MARK: - Properties
     
     weak var delegate: SearchResultsViewControllerDelegate?
     private var sections: [SearchSection] = []
+    
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.backgroundColor = .systemBackground
@@ -32,6 +30,8 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
         return tableView
     }()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
@@ -40,10 +40,13 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
         tableView.dataSource = self
     }
     
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
     }
+    // MARK: - Helpers
     
     func update(with results: [SearchResult]){
         let artists = results.filter({
@@ -53,6 +56,7 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             }
             
         })
+        
         let albums = results.filter({
             switch $0{
             case .album: return true
@@ -60,6 +64,7 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             }
             
         })
+        
         let tracks = results.filter({
             switch $0{
             case .track: return true
@@ -67,6 +72,7 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             }
             
         })
+        
         let playlists = results.filter({
             switch $0{
             case .playlist: return true
@@ -74,6 +80,7 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             }
             
         })
+        
         self.sections = [
             SearchSection(title: "Songs", sections: tracks),
             SearchSection(title: "Artists", sections: artists),
@@ -83,25 +90,27 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
         tableView.reloadData()
         tableView.isHidden = results.isEmpty
     }
+}
+
+// MARK: - UITableViewDelegate, UITableViewDataSource
+
+extension SearchResultsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let result = sections[indexPath.section].sections[indexPath.row]
         
+        let result = sections[indexPath.section].sections[indexPath.row]
         switch result{
-            
         case .artist(let artist):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultDefaultTableViewCell.identifier, for: indexPath) as? SearchResultDefaultTableViewCell else{
                 return UITableViewCell()
             }
             let viewModel = SearchResultDefaultTableViewCellViewModel(title: artist.name, imageURL: URL(string: artist.images?.first?.url ?? ""))
-            
             cell.configure(with: viewModel)
             return cell
-            
         case .album(let album):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultSubtitleTableViewCell.identifier, for: indexPath) as? SearchResultSubtitleTableViewCell else{
                 return UITableViewCell()
@@ -110,7 +119,6 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             
             cell.configure(with: viewModel)
             return cell
-            
         case .track(let track):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultSubtitleTableViewCell.identifier, for: indexPath) as? SearchResultSubtitleTableViewCell else{
                 return UITableViewCell()
@@ -119,14 +127,11 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
             
             cell.configure(with: viewModel)
             return cell
-            
         case .playlist(let playlist):
-            
             guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultSubtitleTableViewCell.identifier, for: indexPath) as? SearchResultSubtitleTableViewCell else{
                 return UITableViewCell()
             }
             let viewModel = SearchResultSubtitleTableViewCellViewModel(title: playlist.name, subtitle: playlist.owner.display_name , imageURL: URL(string: playlist.images.first?.url ?? ""))
-            
             cell.configure(with: viewModel)
             return cell
         }
@@ -141,11 +146,8 @@ class SearchResultsViewController: UIViewController, UITableViewDelegate, UITabl
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         tableView.deselectRow(at: indexPath, animated: true)
-        
         let result = sections[indexPath.section].sections[indexPath.row]
-        
         delegate?.didTapResult(_result: result)
     }
 }

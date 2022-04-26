@@ -8,9 +8,12 @@
 import UIKit
 import GoogleDataTransport
 
-class CategoryViewController: UIViewController {
+final class CategoryViewController: UIViewController {
+    
+    // MARK: - Properties
     
     let category: Category
+    private var playlists = [Playlist]()
     
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: {_, _ -> NSCollectionLayoutSection? in
         let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
@@ -22,6 +25,7 @@ class CategoryViewController: UIViewController {
     }))
     
     //MARK: Init
+    
     init(category: Category){
         self.category = category
         super.init(nibName: nil, bundle: nil)
@@ -31,19 +35,20 @@ class CategoryViewController: UIViewController {
         fatalError()
     }
     
-    private var playlists = [Playlist]()
-    
     //MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = category.name
         view.addSubview(collectionView)
         view.backgroundColor = .systemBackground
+        
         collectionView.backgroundColor = .systemBackground
         collectionView.register(FeaturedPlaylistsCollectionViewCell.self, forCellWithReuseIdentifier: FeaturedPlaylistsCollectionViewCell.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        
         APICaller.shared.getCategoryPlaylists(category: category){ [weak self] result in
             DispatchQueue.main.async {
                 switch result{
@@ -57,14 +62,18 @@ class CategoryViewController: UIViewController {
         }
     }
     
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView.frame = view.bounds
     }
 }
 
+// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 
-extension CategoryViewController: UICollectionViewDelegate, UICollectionViewDataSource{
+extension CategoryViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return playlists.count
     }
@@ -84,5 +93,4 @@ extension CategoryViewController: UICollectionViewDelegate, UICollectionViewData
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
     }
-    
 }

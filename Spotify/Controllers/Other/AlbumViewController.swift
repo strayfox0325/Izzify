@@ -7,16 +7,16 @@
 
 import UIKit
 
-class AlbumViewController: UIViewController {
+final class AlbumViewController: UIViewController {
     
+    // MARK: - Properties
     
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: {_,_ -> NSCollectionLayoutSection? in
         
         let item = NSCollectionLayoutItem(layoutSize:NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
-        )
-        )
+        ))
         item.contentInsets = NSDirectionalEdgeInsets(top: 1, leading: 2, bottom: 1, trailing: 2)
         let group = NSCollectionLayoutGroup.vertical(
             layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
@@ -35,8 +35,9 @@ class AlbumViewController: UIViewController {
     
     private var viewModels = [AlbumCollectionViewCellViewModel]()
     private var tracks = [AudioTrack]()
-    
     private let album: Album
+    
+    // MARK: - Init
     
     init(album:Album){
         self.album = album
@@ -47,13 +48,13 @@ class AlbumViewController: UIViewController {
         fatalError()
     }
     
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = album.name
         view.backgroundColor = .systemBackground
-        
-        
         view.addSubview(collectionView)
         collectionView.register(AlbumTrackCollectionViewCell.self,forCellWithReuseIdentifier: AlbumTrackCollectionViewCell.identifier)
         
@@ -61,10 +62,11 @@ class AlbumViewController: UIViewController {
         collectionView.backgroundColor = .systemBackground
         collectionView.delegate = self
         collectionView.dataSource = self
-        
         fetchData()
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapActions))
     }
+    
+    // MARK: - Actions
     
     @objc func didTapActions(){
         let actionSheet = UIAlertController(title: album.name, message: "Actions", preferredStyle: .actionSheet)
@@ -86,6 +88,8 @@ class AlbumViewController: UIViewController {
         present(actionSheet, animated: true)
     }
     
+    // MARK: - Helpers
+    
     func fetchData(){
         APICaller.shared.getAlbumDetails(for: album){[weak self] result in
             DispatchQueue.main.async{
@@ -104,24 +108,29 @@ class AlbumViewController: UIViewController {
         }
     }
     
+    // MARK: - Layout
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView.frame = view.bounds
     }
 }
 
+// MARK: - UICollectionViewDelegate,UICollectionViewDataSource
+
 extension AlbumViewController: UICollectionViewDelegate,UICollectionViewDataSource {
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModels.count
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumTrackCollectionViewCell.identifier, for: indexPath) as? AlbumTrackCollectionViewCell else{
             return UICollectionViewCell()
         }
-        
         cell.configure(with: viewModels[indexPath.row])
         return cell
     }
@@ -145,6 +154,8 @@ extension AlbumViewController: UICollectionViewDelegate,UICollectionViewDataSour
         PlaybackPresenter.shared.startPlayback(from: self, track: track)
     }
 }
+
+// MARK: - PlaylistHeaderCollectionReusableViewDelegate
 
 extension AlbumViewController: PlaylistHeaderCollectionReusableViewDelegate{
     func PlaylistHeaderCollectionReusableViewDidTapPlayAll(_ header: PlaylistHeaderCollectionReusableView) {

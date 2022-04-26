@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+// MARK: - PlayerControlsViewDelegate
+
 protocol PlayerControlsViewDelegate: AnyObject {
     func playerControlsViewDidTapPlayPauseButton(_ playerControlsView: PlayerControlView)
     func playerControlsViewDidTapBackButton(_ playerControlsView: PlayerControlView)
@@ -15,12 +17,9 @@ protocol PlayerControlsViewDelegate: AnyObject {
     func PlayerControlsView(_ playerControlsView: PlayerControlView, didSlideSlider value:Float)
 }
 
-struct PlayerControlsViewViewModel {
-    let title: String?
-    let subtitle: String?
-}
-
-final class PlayerControlView: UIView{
+class PlayerControlView: UIView{
+    
+    // MARK: - Properties
     
     weak var delegate: PlayerControlsViewDelegate?
     private var isPlaying = true
@@ -53,6 +52,7 @@ final class PlayerControlView: UIView{
         button.setImage(image, for: .normal)
         return button
     }()
+    
     private let nextButton: UIButton = {
         let button = UIButton()
         button.tintColor = .label
@@ -60,6 +60,7 @@ final class PlayerControlView: UIView{
         button.setImage(image, for: .normal)
         return button
     }()
+    
     private let playPauseButton: UIButton = {
         let button = UIButton()
         button.tintColor = .label
@@ -68,29 +69,29 @@ final class PlayerControlView: UIView{
         return button
     }()
     
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
         
+        backgroundColor = .clear
         addSubview(nameLabel)
         addSubview(subtitleLabel)
-        
         addSubview(volumeSlider)
         volumeSlider.addTarget(self, action: #selector(didSlideSlider(_:)), for: .valueChanged)
-        
         addSubview(backButton)
         addSubview(nextButton)
         addSubview(playPauseButton)
-        
         backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(didTapNext), for: .touchUpInside)
         playPauseButton.addTarget(self, action: #selector(didTapPlayPause), for: .touchUpInside)
-        
         clipsToBounds = true
     }
+    
     required init?(coder: NSCoder) {
         fatalError()
     }
+    
+    // MARK: - Actions
     
     @objc func didSlideSlider(_ slider: UISlider){
         let value = slider.value
@@ -100,9 +101,11 @@ final class PlayerControlView: UIView{
     @objc private func didTapBack(){
         delegate?.playerControlsViewDidTapBackButton(self)
     }
+    
     @objc private func didTapNext(){
         delegate?.playerControlsViewDidTapNextButton(self)
     }
+    
     @objc private func didTapPlayPause(){
         self.isPlaying = !isPlaying
         delegate?.playerControlsViewDidTapPlayPauseButton(self)
@@ -112,18 +115,20 @@ final class PlayerControlView: UIView{
         playPauseButton.setImage(isPlaying ? pause : play, for: .normal)
     }
     
+    // MARK: - Layout
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         nameLabel.frame = CGRect(x: 0, y: 0, width: width, height: 50)
         subtitleLabel.frame = CGRect(x: 0, y: nameLabel.bottom+10, width: width, height: 50)
-        
         volumeSlider.frame = CGRect(x: 10, y: subtitleLabel.bottom+20, width: width-20, height: 44)
-        
         let buttonSize: CGFloat = 60
         playPauseButton.frame = CGRect(x: (width-buttonSize)/2, y: volumeSlider.bottom+30, width: buttonSize+10, height: buttonSize+10)
         backButton.frame = CGRect(x: playPauseButton.left-60-buttonSize, y: playPauseButton.top, width: buttonSize, height: buttonSize)
         nextButton.frame = CGRect(x: playPauseButton.right+60, y: playPauseButton.top, width: buttonSize, height: buttonSize)
     }
+    
+    // MARK: - Helpers
     
     func configure(with viewModel: PlayerControlsViewViewModel){
         nameLabel.text = viewModel.title

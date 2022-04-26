@@ -1,18 +1,25 @@
 //
-//  AlbumTrackCollectionViewCell.swift
+//  RecommendedTracksCollectionViewCell.swift
 //  Spotify
 //
-//  Created by Isidora Lazic on 3.2.22..
+//  Created by Isidora Lazic on 1.2.22..
 //
 
-import Foundation
 import UIKit
 
-class AlbumTrackCollectionViewCell: UICollectionViewCell {
-   
+class RecommendedTracksCollectionViewCell: UICollectionViewCell {
+    
     // MARK: - Properties
     
-    static let identifier = "AlbumTrackCollectionViewCell"
+    static let identifier = "RecommendedTracksCollectionViewCell"
+    
+    private let albumCoverImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.masksToBounds = true
+        imageView.image = UIImage(systemName: "photo")
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
     
     private let trackNameLabel: UILabel = {
         let label = UILabel()
@@ -34,6 +41,7 @@ class AlbumTrackCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         backgroundColor = .secondarySystemBackground
         contentView.backgroundColor = .secondarySystemBackground
+        contentView.addSubview(albumCoverImageView)
         contentView.addSubview(trackNameLabel)
         contentView.addSubview(artistNameLabel)
         contentView.clipsToBounds = true
@@ -47,21 +55,23 @@ class AlbumTrackCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        trackNameLabel.frame = CGRect(x: 10, y: 0, width: contentView.width-15, height: contentView.height/2)
-        artistNameLabel.frame = CGRect(x: 10, y: contentView.height/2, width: contentView.width-15, height: contentView.height/2)
+        albumCoverImageView.frame = CGRect(x: 5, y: 2, width: contentView.height-4, height: contentView.height-4)
+        trackNameLabel.frame = CGRect(x: albumCoverImageView.right+10, y: 0, width: contentView.width-albumCoverImageView.right-15, height: contentView.height/2)
+        artistNameLabel.frame = CGRect(x: albumCoverImageView.right+10, y: contentView.height/2, width: contentView.width-albumCoverImageView.right-15, height: contentView.height/2)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         trackNameLabel.text = nil
         artistNameLabel.text=nil
+        albumCoverImageView.image=nil
     }
     
     // MARK: - Helpers
     
-    func configure(with viewModel:AlbumCollectionViewCellViewModel){
+    func configure(with viewModel:RecommendedTrackCellViewModel){
         trackNameLabel.text = viewModel.trackName
         artistNameLabel.text=viewModel.artistName
+        albumCoverImageView.sd_setImage(with: viewModel.artworkURL, completed: nil)
     }
 }

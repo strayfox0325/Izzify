@@ -7,14 +7,16 @@
 
 import UIKit
 
-class WelcomeViewController: UIViewController {
+final class WelcomeViewController: UIViewController {
+    
+    // MARK: - Properties
     
     private let signInButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .white
         button.setTitle("Sign In with Izzify", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        
+        button.backgroundColor = UIColor(red: 192/255, green: 244/255, blue: 233/255, alpha: 1.0)
+        button.layer.cornerRadius = 20
         return button
     }()
     
@@ -36,6 +38,8 @@ class WelcomeViewController: UIViewController {
         let logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.image = UIImage(named: "logo")
+        logoImageView.layer.cornerRadius = 80
+        logoImageView.clipsToBounds = true
         return logoImageView
     }()
     
@@ -49,9 +53,10 @@ class WelcomeViewController: UIViewController {
         return label
     }()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        title="Izzify"
         view.addSubview(bgImageView)
         view.addSubview(overlayView)
         view.backgroundColor = .black
@@ -61,19 +66,23 @@ class WelcomeViewController: UIViewController {
         view.addSubview(label)
     }
     
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         bgImageView.frame = view.bounds
         overlayView.frame = view.bounds
         signInButton.frame=CGRect(
             x: 20,
-            y: view.height-50-view.safeAreaInsets.bottom,
+            y: view.height-150-view.safeAreaInsets.bottom,
             width: view.width-40,
             height: 50
         )
         logoImageView.frame = CGRect(x: (view.width-120)/2, y: (view.height-350)/2, width: 120, height: 120)
         label.frame = CGRect(x: 30, y: logoImageView.bottom+30, width: view.width-60, height: 150)
     }
+    
+    // MARK: - Actions
     
     @objc func didTapSignIn(){
         let vc = AuthViewController()
@@ -87,8 +96,9 @@ class WelcomeViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    // MARK: - Helpers
     private func handleSignIn(success:Bool){
-        //log in or show error
+        // log in or show error
         guard success else{
             let alert = UIAlertController(title: "Oops!",
                                           message: "Something went wrong.",

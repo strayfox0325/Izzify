@@ -10,9 +10,15 @@ import UIKit
 
 final class HapticsManager{
     
+    // MARK: - Singleton
+    
     static let shared = HapticsManager()
     
+    // MARK: - Init
+    
     private init(){}
+    
+    // MARK: - Helpers
     
     public func vibrateForSelection(){
         DispatchQueue.main.async {

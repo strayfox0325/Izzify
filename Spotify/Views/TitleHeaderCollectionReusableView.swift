@@ -8,7 +8,11 @@
 import UIKit
 
 class TitleHeaderCollectionReusableView: UICollectionReusableView {
+   
+    // MARK: - Properties
+    
     static let identifier = "TitleHeaderCollectionReusableView"
+    
     private let label: UILabel = {
         let label = UILabel()
         label.textColor = .label
@@ -16,6 +20,8 @@ class TitleHeaderCollectionReusableView: UICollectionReusableView {
         label.font = .systemFont(ofSize: 22, weight: .regular)
         return label
     }()
+    
+    // MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,10 +33,14 @@ class TitleHeaderCollectionReusableView: UICollectionReusableView {
         fatalError()
     }
     
+    // MARK: - Layout
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         label.frame = CGRect(x: 15, y: 0, width: width-30, height: height)
     }
+    
+    // MARK: - Helpers
     
     func configure(with title: String){
         label.text = title

@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - LibraryToggleViewDelegate
+
 protocol LibraryToggleViewDelegate: AnyObject{
     func LibraryToggleViewDidTapPlaylists(_ toggleView: LibraryToggleView)
     func LibraryToggleViewDidTapAlbums(_ toggleView: LibraryToggleView)
@@ -14,13 +16,9 @@ protocol LibraryToggleViewDelegate: AnyObject{
 
 class LibraryToggleView: UIView {
     
-    enum State{
-        case playlist
-        case album
-    }
+    // MARK: - Properties
     
     var state: State = .playlist
-    
     weak var delegate: LibraryToggleViewDelegate?
     
     private let playlistsButton: UIButton = {
@@ -29,12 +27,14 @@ class LibraryToggleView: UIView {
         button.setTitle("Playlists", for: .normal)
         return button
     }()
+    
     private let albumsButton: UIButton = {
         let button = UIButton()
         button.setTitleColor(.label, for: .normal)
         button.setTitle("Albums", for: .normal)
         return button
     }()
+    
     private let indicatorView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemGreen
@@ -43,9 +43,11 @@ class LibraryToggleView: UIView {
         return view
     }()
     
+    // MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         addSubview(playlistsButton)
         addSubview(albumsButton)
         addSubview(indicatorView)
@@ -54,6 +56,14 @@ class LibraryToggleView: UIView {
         albumsButton.addTarget(self, action: #selector(didTapAlbums), for: .touchUpInside)
     }
     
+    // MARK: - Init
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    // MARK: - Actions
+    
     @objc private func didTapPlaylists(){
         state = .playlist
         UIView.animate(withDuration: 0.2){
@@ -61,6 +71,7 @@ class LibraryToggleView: UIView {
         }
         delegate?.LibraryToggleViewDidTapPlaylists(self)
     }
+    
     @objc private func didTapAlbums(){
         state = .album
         UIView.animate(withDuration: 0.2){
@@ -68,15 +79,17 @@ class LibraryToggleView: UIView {
         }
         delegate?.LibraryToggleViewDidTapAlbums(self)
     }
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
+    
+   // MARK: - Layout
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         playlistsButton.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
         albumsButton.frame = CGRect(x: playlistsButton.right, y: 0, width: 100, height: 40)
         layoutIndicator()
     }
+    
+    // MARK: - Helpers
     
     func layoutIndicator(){
         switch state {

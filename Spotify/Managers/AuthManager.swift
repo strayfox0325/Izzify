@@ -8,27 +8,25 @@
 import Foundation
 
 final class AuthManager {
+    
+    // MARK: - Singleton
+    
     static let shared = AuthManager()
+    
+    // MARK: - Init
+    
+    private init() {}
+    
+    // MARK: - Properties
+    
     private var refreshingToken=false;
-    
-    struct Constants{
-        static let clientID="850f71e8bdd44a5c8b2386c3021a8b01"
-        static let clientSecret="22b311d98ead41d69375a8de010f64d9"
-        static let tokenAPIURL = "https://accounts.spotify.com/api/token"
-        static let redirectURI = "https://cubes.edu.rs/"
-        static let scopes = "user-read-private%20playlist-modify-public%20playlist-read-private%20playlist-modify-private%20user-library-modify%20user-follow-read%20user-library-read%20user-read-email"
-        
-    }
-    
-    private init()
-    {}
-    
     public var signInURL: URL? {
         let base = "https://accounts.spotify.com/authorize"
         let string = "\(base)?response_type=code&client_id=\(Constants.clientID)&scope=\(Constants.scopes)&redirect_uri=\(Constants.redirectURI)&show_dialog=TRUE"
         return URL(string: string)
         
     }
+    
     var isSignedIn: Bool {
         return accessToken != nil
     }
@@ -36,6 +34,7 @@ final class AuthManager {
     private var accessToken: String?{
         return UserDefaults.standard.string(forKey: "access_token")
     }
+    
     private var refreshToken: String?{
         return UserDefaults.standard.string(forKey: "refresh_token")
     }
@@ -43,6 +42,7 @@ final class AuthManager {
     private var tokenExpirationDate: Date?{
         return UserDefaults.standard.object(forKey: "expirationDate") as? Date
     }
+    
     private var shouldRefreshToken: Bool{
         guard let expirationDate = tokenExpirationDate else{
             return false
@@ -50,6 +50,9 @@ final class AuthManager {
         let currentDate=Date()
         return currentDate.addingTimeInterval(300) >= expirationDate //5min
     }
+    
+    // MARK: - Helpers
+    
     public func exchangeCodeForToken(
         code: String,
         completition: @escaping ((Bool) -> Void)
@@ -58,14 +61,12 @@ final class AuthManager {
         guard let url = URL(string: Constants.tokenAPIURL) else {
             return
         }
-        
         var components = URLComponents()
         components.queryItems = [
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
         ]
-        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -107,7 +108,6 @@ final class AuthManager {
     }
     
     private var onRefreshBlocks = [((String)->Void)]()
-    
     //Supplies a valid token to be used with API calls
     public func withValidToken(completion: @escaping (String)->Void){
         guard !refreshingToken else{
@@ -128,7 +128,6 @@ final class AuthManager {
     
     public func refreshAccessToken(completion: ((Bool) -> Void)?)
     {
-        
         guard !refreshingToken else {
             return
         }
@@ -144,7 +143,6 @@ final class AuthManager {
         guard let url = URL(string: Constants.tokenAPIURL) else {
             return
         }
-        
         refreshingToken=true;
         
         var components = URLComponents()
@@ -187,7 +185,6 @@ final class AuthManager {
         }
         task.resume()
     }
-    
     
     public func signOut(completion: (Bool)->Void){
         UserDefaults.standard.setValue(nil, forKey: "access_token")

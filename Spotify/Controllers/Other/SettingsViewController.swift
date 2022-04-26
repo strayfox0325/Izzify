@@ -7,8 +7,9 @@
 
 import UIKit
 
-class SettingsViewController: UIViewController, UITableViewDelegate,UITableViewDataSource {
+final class SettingsViewController: UIViewController {
     
+    // MARK: - Properties
     
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero,style: .grouped)
@@ -17,6 +18,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate,UITableViewD
     }()
     
     private var sections = [Section]()
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +30,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate,UITableViewD
         tableView.dataSource = self
         tableView.delegate = self
     }
+    
+    // MARK: - Helpers
     
     private func configureModels(){
         sections.append(Section(title: "Profile", options: [Option(title: "View Your Profile", handler: {[weak self] in
@@ -61,23 +66,25 @@ class SettingsViewController: UIViewController, UITableViewDelegate,UITableViewD
         }))
         present(alert, animated: true)
     }
+    
     private func viewProfile(){
         let vc = ProfileViewController()
         vc.title = "Profile"
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame=view.bounds
     }
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return sections.count
-    }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sections[section].options.count
-        
-    }
+}
+
+// MARK: - UITableViewDelegate,UITableViewDataSource
+
+extension SettingsViewController: UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = sections[indexPath.section].options[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
@@ -93,5 +100,11 @@ class SettingsViewController: UIViewController, UITableViewDelegate,UITableViewD
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let model = sections[section]
         return model.title
+    }
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return sections.count
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return sections[section].options.count
     }
 }

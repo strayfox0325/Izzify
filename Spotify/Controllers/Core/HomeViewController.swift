@@ -7,30 +7,14 @@
 
 import UIKit
 
-enum BrowseSectionType{
-    case newReleases(viewModels:[NewReleasesCellViewModel])
-    case featurePlaylists(viewModels:[FeaturedPlaylistCellViewModel])
-    case recommendedTracks(viewModels:[RecommendedTrackCellViewModel])
+final class HomeViewController: UIViewController {
     
-    var title: String{
-        switch self{
-        case .newReleases:
-            return "New Album Releases"
-        case .featurePlaylists:
-            return "Featured Playlists"
-        case .recommendedTracks:
-            return "Recommended"
-        }
-    }
-}
-
-class HomeViewController: UIViewController {
-    
+    // MARK: - Properties
     
     private var newAlbums: [Album] = []
     private var playlists: [Playlist] = []
     private var tracks: [AudioTrack] = []
-    
+    private var sections = [BrowseSectionType]()
     
     private var collectionView: UICollectionView = UICollectionView(
         frame: .zero,
@@ -46,7 +30,7 @@ class HomeViewController: UIViewController {
         return spinner
     }()
     
-    private var sections = [BrowseSectionType]()
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,16 +48,15 @@ class HomeViewController: UIViewController {
         addLongTapGesture()
     }
     
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView.frame = view.bounds
     }
     
-    private func addLongTapGesture(){
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(_:)))
-        collectionView.isUserInteractionEnabled = true
-        collectionView.addGestureRecognizer(gesture)
-    }
+    // MARK: - Actions
+    
     @objc func didLongPress(_ gesture: UILongPressGestureRecognizer){
         guard gesture.state == .began else{
             return
@@ -100,6 +83,21 @@ class HomeViewController: UIViewController {
         present(actionSheet,animated: true)
     }
     
+    @objc func didTapSettings(){
+        let vc = SettingsViewController()
+        vc.title = "Settings"
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    // MARK: - Helpers
+    
+    private func addLongTapGesture(){
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(_:)))
+        collectionView.isUserInteractionEnabled = true
+        collectionView.addGestureRecognizer(gesture)
+    }
+    
     private func configureCollectionView(){
         view.addSubview(collectionView)
         collectionView.register(UICollectionViewCell.self,
@@ -119,16 +117,13 @@ class HomeViewController: UIViewController {
     }
     
     private func fetchData(){
-        
         let group = DispatchGroup()
         group.enter()
         group.enter()
         group.enter()
-        
         var newReleases: NewReleasesResponse?
         var featuredPlaylists: FeaturedPlaylistsResponse?
         var recommendations: RecommendationsResponse?
-        
         //New Releases
         APICaller.shared.getNewReleases{result in
             defer{
@@ -141,8 +136,6 @@ class HomeViewController: UIViewController {
                 print(error.localizedDescription)
             }
         }
-        
-        
         //Featured Playlists
         APICaller.shared.getFeaturedPlaylists{result in
             defer{
@@ -156,7 +149,6 @@ class HomeViewController: UIViewController {
                 
             }
         }
-        
         //Recommended Tracks
         APICaller.shared.getRecommendedGenres { result in
             switch result{
@@ -185,8 +177,6 @@ class HomeViewController: UIViewController {
                 print(error.localizedDescription)
             }
         }
-        
-        
         group.notify(queue: .main){
             guard let newAlbums=newReleases?.albums.items,
                   let playlists=featuredPlaylists?.playlists.items,
@@ -207,27 +197,17 @@ class HomeViewController: UIViewController {
         sections.append(.newReleases(viewModels: newAlbums.compactMap({
             return NewReleasesCellViewModel(name: $0.name, artworkURL: URL(string:$0.images.first?.url ?? "N/A"), numberOfTracks: $0.total_tracks, artistName: $0.artists.first?.name ?? "N/A")
         })))
-        
         sections.append(.featurePlaylists(viewModels: playlists.compactMap({
             return FeaturedPlaylistCellViewModel(playlistName: $0.name, artworkURL: URL(string:$0.images.first?.url ?? "N/A"), ownerName: $0.owner.display_name)
         })))
-        
-        
         sections.append(.recommendedTracks(viewModels: tracks.compactMap({
             return RecommendedTrackCellViewModel(trackName: $0.name, artistName: $0.artists.first?.name ?? "N/A", artworkURL: URL(string: $0.album?.images.first?.url ?? "N/A"))
         })))
-        
-        
         collectionView.reloadData()
     }
-    
-    @objc func didTapSettings(){
-        let vc = SettingsViewController()
-        vc.title = "Settings"
-        vc.navigationItem.largeTitleDisplayMode = .never
-        navigationController?.pushViewController(vc, animated: true)
-    }
 }
+
+// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -242,14 +222,15 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             return viewModels.count
         }
     }
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let type = sections[indexPath.section]
         switch type{
-            
         case .newReleases(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: NewReleaseCollectionViewCell.identifier,
@@ -261,7 +242,6 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             let viewModel = viewModels[indexPath.row]
             cell.configure(with: viewModel)
             return cell
-            
         case .featurePlaylists(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: FeaturedPlaylistsCollectionViewCell.identifier,
@@ -271,7 +251,6 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             }
             cell.configure(with: viewModels[indexPath.row])
             return cell
-            
         case .recommendedTracks(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: RecommendedTracksCollectionViewCell.identifier,
@@ -290,25 +269,21 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         collectionView.deselectItem(at: indexPath, animated: true)
         let section = sections[indexPath.section]
         switch section{
-            
         case .featurePlaylists:
             let playlist = playlists[indexPath.row]
             let vc = PlaylistViewController(playlist: playlist)
             vc.title = playlist.name
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
-            
         case .newReleases:
             let album = newAlbums[indexPath.row]
             let vc = AlbumViewController(album: album)
             vc.title = album.name
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
-            
         case .recommendedTracks:
             let track = tracks[indexPath.row]
             PlaybackPresenter.shared.startPlayback(from: self, track: track)
-            
         }
     }
     
@@ -430,6 +405,4 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             return section
         }
     }
-    
-    
 }

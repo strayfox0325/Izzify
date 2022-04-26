@@ -8,6 +8,8 @@
 import UIKit
 import SDWebImage
 
+// MARK: - PlayerViewControllerDelegate
+
 protocol PlayerViewControllerDelegate: AnyObject{
     func didTapPlayPause()
     func didTapNext()
@@ -15,18 +17,22 @@ protocol PlayerViewControllerDelegate: AnyObject{
     func didSlideSlider(_ value: Float)
 }
 
-class PlayerViewController: UIViewController{
+final class PlayerViewController: UIViewController{
+    
+    // MARK: - Properties
     
     weak var dataSource: PlayerDataSource?
     weak var delegate: PlayerViewControllerDelegate?
+    
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
-    
     private let controlsView = PlayerControlView()
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,34 +44,41 @@ class PlayerViewController: UIViewController{
         configure()
     }
     
+    // MARK: - Layout
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         imageView.frame=CGRect(x: 0, y: view.safeAreaInsets.top, width: view.width, height: view.width)
         controlsView.frame = CGRect(x: 10, y: imageView.bottom+10, width: view.width-20, height: view.height-imageView.height-view.safeAreaInsets.top-view.safeAreaInsets.bottom-15)
     }
     
+    // MARK: - Helpers
     
     private func configure(){
         imageView.sd_setImage(with: dataSource?.imageURL, completed: nil)
         controlsView.configure(with: PlayerControlsViewViewModel(title: dataSource?.songName, subtitle: dataSource?.subtitle))
     }
     
-    
     private func configureBarButtons(){
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector( didTapClose))
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector( didTapAction))
     }
     
-    @objc private func didTapClose(){
-        dismiss(animated: true, completion: nil)
-    }
-    @objc private func didTapAction(){
-        
-    }
     func refreshUI(){
         configure()
     }
+    
+    // MARK: - Actions
+    
+    @objc private func didTapClose(){
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc private func didTapAction(){
+    }
 }
+
+// MARK: - PlayerControlsViewDelegate
 
 extension PlayerViewController: PlayerControlsViewDelegate {
     func playerControlsViewDidTapPlayPauseButton(_ playerControlsView: PlayerControlView) {
@@ -82,5 +95,4 @@ extension PlayerViewController: PlayerControlsViewDelegate {
     func PlayerControlsView(_ playerControlsView: PlayerControlView, didSlideSlider value: Float) {
         delegate?.didSlideSlider(value)
     }
-    
 }

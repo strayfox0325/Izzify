@@ -7,16 +7,15 @@
 
 import UIKit
 
-struct ActionLabelViewViewModel{
-    let text: String
-    let actionTitle: String
-}
+// MARK: - ActionLabelViewDelegate
 
 protocol ActionLabelViewDelegate: AnyObject{
     func actionLabelViewDidTapButton(_ actionView: ActionLabelView)
 }
 
 class ActionLabelView: UIView {
+    
+    // MARK: - Properties
     
     weak var delegate: ActionLabelViewDelegate?
     
@@ -34,6 +33,8 @@ class ActionLabelView: UIView {
         return button
     }()
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         clipsToBounds = true
@@ -47,9 +48,7 @@ class ActionLabelView: UIView {
         fatalError()
     }
     
-    @objc func didTapButton(){
-        delegate?.actionLabelViewDidTapButton(self)
-    }
+    // MARK: - Layout
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -57,11 +56,18 @@ class ActionLabelView: UIView {
         label.frame = CGRect(x: 0, y: 0, width: width, height: height-45)
     }
     
+    // MARK: - Actions
+    
+    @objc func didTapButton(){
+        delegate?.actionLabelViewDidTapButton(self)
+    }
+    
+    // MARK: - Helpers
+    
     func configure(with viewModel: ActionLabelViewViewModel){
         label.text = viewModel.text
         button.setTitle(viewModel.actionTitle, for: .normal)
     }
-    
 }
 
 
