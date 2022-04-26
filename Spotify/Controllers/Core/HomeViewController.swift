@@ -25,7 +25,7 @@ final class HomeViewController: UIViewController {
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
-        spinner.tintColor = .label
+        spinner.tintColor = .systemTeal
         spinner.hidesWhenStopped = true
         return spinner
     }()

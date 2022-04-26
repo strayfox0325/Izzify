@@ -47,7 +47,7 @@ class PlayerControlView: UIView{
     
     private let backButton: UIButton = {
         let button = UIButton()
-        button.tintColor = .label
+        button.tintColor = .systemTeal
         let image = UIImage(systemName: "backward.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .regular))
         button.setImage(image, for: .normal)
         return button
@@ -55,7 +55,7 @@ class PlayerControlView: UIView{
     
     private let nextButton: UIButton = {
         let button = UIButton()
-        button.tintColor = .label
+        button.tintColor = .systemTeal
         let image = UIImage(systemName: "forward.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .regular))
         button.setImage(image, for: .normal)
         return button
@@ -63,7 +63,7 @@ class PlayerControlView: UIView{
     
     private let playPauseButton: UIButton = {
         let button = UIButton()
-        button.tintColor = .label
+        button.tintColor = .systemTeal
         let image = UIImage(systemName: "pause", withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .regular))
         button.setImage(image, for: .normal)
         return button

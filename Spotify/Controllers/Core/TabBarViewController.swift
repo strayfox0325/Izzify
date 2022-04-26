@@ -14,6 +14,8 @@ final class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        UITabBar.appearance().tintColor = UIColor.systemTeal
+        
         let vc1 = HomeViewController()
         let vc2 = SearchViewController()
         let vc3 = LibraryViewController()
@@ -30,9 +32,9 @@ final class TabBarViewController: UITabBarController {
         let nav2 = UINavigationController(rootViewController: vc2)
         let nav3 = UINavigationController(rootViewController: vc3)
         
-        nav1.navigationBar.tintColor = .label
-        nav2.navigationBar.tintColor = .label
-        nav3.navigationBar.tintColor = .label
+        nav1.navigationBar.tintColor = .systemTeal
+        nav2.navigationBar.tintColor = .systemTeal
+        nav3.navigationBar.tintColor = .systemTeal
         
         nav1.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName:"house"), tag:1)
         nav2.tabBarItem = UITabBarItem(title: "Search", image: UIImage(systemName:"magnifyingglass"), tag:1)

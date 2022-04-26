@@ -23,21 +23,21 @@ class LibraryToggleView: UIView {
     
     private let playlistsButton: UIButton = {
         let button = UIButton()
-        button.setTitleColor(.label, for: .normal)
+        button.setTitleColor(.systemTeal , for: .normal)
         button.setTitle("Playlists", for: .normal)
         return button
     }()
     
     private let albumsButton: UIButton = {
         let button = UIButton()
-        button.setTitleColor(.label, for: .normal)
+        button.setTitleColor(.systemTeal, for: .normal)
         button.setTitle("Albums", for: .normal)
         return button
     }()
     
     private let indicatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGreen
+        view.backgroundColor = .systemMint
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 4
         return view

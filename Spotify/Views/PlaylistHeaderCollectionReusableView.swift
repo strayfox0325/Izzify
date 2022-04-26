@@ -51,7 +51,7 @@ class PlaylistHeaderCollectionReusableView: UICollectionReusableView {
     
     private let playAllButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = .systemTeal
         let image = UIImage(systemName: "play.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .regular))
         button.setImage(image, for: .normal)
         button.tintColor = .white
