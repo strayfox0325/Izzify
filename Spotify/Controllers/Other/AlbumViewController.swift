@@ -159,8 +159,7 @@ extension AlbumViewController: UICollectionViewDelegate,UICollectionViewDataSour
 
 extension AlbumViewController: PlaylistHeaderCollectionReusableViewDelegate{
     func PlaylistHeaderCollectionReusableViewDidTapPlayAll(_ header: PlaylistHeaderCollectionReusableView) {
-        
-        let tracksWithAlbum: [AudioTrack] = tracks.compactMap({
+            let tracksWithAlbum: [AudioTrack] = tracks.compactMap({
             var track = $0
             track.album = self.album
             return track

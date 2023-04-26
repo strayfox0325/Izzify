@@ -9,10 +9,11 @@ import UIKit
 
 class LibraryPlaylistsViewController: UIViewController {
     
+    // MARK: - Properties
+    
     var playlists = [Playlist]()
     
     public var selectionHandler: ((Playlist) -> Void)?
-    
     
     private let noPlaylistsView = ActionLabelView()
     
@@ -22,6 +23,9 @@ class LibraryPlaylistsViewController: UIViewController {
         tableView.isHidden = true
         return tableView
     }()
+    
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -35,10 +39,6 @@ class LibraryPlaylistsViewController: UIViewController {
         }
     }
     
-    @objc func didTapClose(){
-        dismiss(animated: true, completion: nil)
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         noPlaylistsView.frame = CGRect(x: 0, y: 0, width: 150, height: 150)
@@ -46,11 +46,16 @@ class LibraryPlaylistsViewController: UIViewController {
         tableView.frame = view.bounds
     }
     
+    @objc func didTapClose(){
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // MARK: - Helpers
+    
     private func setUpNoPlaylistsView(){
         view.addSubview(noPlaylistsView)
         noPlaylistsView.delegate = self
         noPlaylistsView.configure(with: ActionLabelViewViewModel(text: "You don't have any playlists yet.", actionTitle: "Create"))
-        
     }
     
     private func fetchData(){
@@ -77,6 +82,7 @@ class LibraryPlaylistsViewController: UIViewController {
             tableView.isHidden = false
         }
     }
+    
     public func showCreatePlaylistAlert(){
         let alert = UIAlertController(title: "New Playlist", message: "Enter playlist name", preferredStyle: .alert)
         alert.addTextField { textField in
@@ -106,12 +112,17 @@ class LibraryPlaylistsViewController: UIViewController {
     }
 }
 
+// MARK: - ActionLabelViewDelegate
+
 extension LibraryPlaylistsViewController: ActionLabelViewDelegate {
     func actionLabelViewDidTapButton(_ actionView: ActionLabelView) {
         //Create a playlist UI
         showCreatePlaylistAlert()
     }
 }
+
+// MARK: - UITableViewDelegate,UITableViewDataSource
+
 extension LibraryPlaylistsViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

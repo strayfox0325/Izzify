@@ -9,6 +9,8 @@ import UIKit
 
 class LibraryAlbumsViewController: UIViewController {
     
+    // MARK: - Properties
+    
     var albums = [Album]()
     
     private let noAlbumsView = ActionLabelView()
@@ -21,6 +23,8 @@ class LibraryAlbumsViewController: UIViewController {
     }()
     
     private var observer: NSObjectProtocol?
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,15 +39,19 @@ class LibraryAlbumsViewController: UIViewController {
         })
     }
     
-    @objc func didTapClose(){
-        dismiss(animated: true, completion: nil)
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         noAlbumsView.frame = CGRect(x: (view.width-150)/2, y: (view.height-150)/2, width: 150, height: 150)
         tableView.frame = CGRect(x: 0, y: 0, width: view.width, height: view.height)
     }
+    
+    // MARK: - Actions
+    
+    @objc func didTapClose(){
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // Helpers
     
     private func setUpNoAlbumsView(){
         view.addSubview(noAlbumsView)
@@ -79,11 +87,16 @@ class LibraryAlbumsViewController: UIViewController {
     }
 }
 
+// MARK: - ActionLabelViewDelegate
+
 extension LibraryAlbumsViewController: ActionLabelViewDelegate {
     func actionLabelViewDidTapButton(_ actionView: ActionLabelView) {
         tabBarController?.selectedIndex = 0
     }
 }
+
+// MARK: - UITableViewDelegate,UITableViewDataSource
+
 extension LibraryAlbumsViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -94,7 +107,6 @@ extension LibraryAlbumsViewController: UITableViewDelegate,UITableViewDataSource
         cell.configure(with: SearchResultSubtitleTableViewCellViewModel(title: album.name, subtitle: album.artists.first?.name ?? "N/A", imageURL: URL(string: album.images.first?.url ?? "")))
         return cell
     }
-    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return albums.count

@@ -37,8 +37,8 @@ final class WelcomeViewController: UIViewController {
     private let logoImageView: UIImageView = {
         let logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        logoImageView.image = UIImage(named: "logo")
-        logoImageView.layer.cornerRadius = 80
+        logoImageView.image = UIImage(named: "welcome_image")
+        logoImageView.layer.cornerRadius = 60
         logoImageView.clipsToBounds = true
         return logoImageView
     }()

@@ -15,6 +15,7 @@ protocol PlayerViewControllerDelegate: AnyObject{
     func didTapNext()
     func didTapBack()
     func didSlideSlider(_ value: Float)
+    func closePlayer()
 }
 
 final class PlayerViewController: UIViewController{
@@ -61,20 +62,25 @@ final class PlayerViewController: UIViewController{
     
     private func configureBarButtons(){
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector( didTapClose))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector( didTapAction))
     }
     
     func refreshUI(){
         configure()
     }
     
+    func notifyUser(title: String, message: String) {
+        let alert = UIAlertController(title: "Action Unavailable",
+                                      message: "You must be a Premium member to play previous tracks",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))        
+        present(alert,animated: true)
+    }
+    
     // MARK: - Actions
     
     @objc private func didTapClose(){
+        delegate?.closePlayer()
         dismiss(animated: true, completion: nil)
-    }
-    
-    @objc private func didTapAction(){
     }
 }
 
@@ -87,6 +93,7 @@ extension PlayerViewController: PlayerControlsViewDelegate {
     
     func playerControlsViewDidTapBackButton(_ playerControlsView: PlayerControlView) {
         delegate?.didTapBack()
+        notifyUser(title: "Action Unavailable", message: "You need Premium Account to play previous tracks")
     }
     
     func playerControlsViewDidTapNextButton(_ playerControlsView: PlayerControlView) {
@@ -94,5 +101,8 @@ extension PlayerViewController: PlayerControlsViewDelegate {
     }
     func PlayerControlsView(_ playerControlsView: PlayerControlView, didSlideSlider value: Float) {
         delegate?.didSlideSlider(value)
+    }
+    func PlayerControlsViewDidTapClose(_ playerControlsView: PlayerControlView) {
+        delegate?.closePlayer()
     }
 }

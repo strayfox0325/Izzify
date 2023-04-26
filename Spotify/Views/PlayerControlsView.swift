@@ -15,6 +15,7 @@ protocol PlayerControlsViewDelegate: AnyObject {
     func playerControlsViewDidTapBackButton(_ playerControlsView: PlayerControlView)
     func playerControlsViewDidTapNextButton(_ playerControlsView: PlayerControlView)
     func PlayerControlsView(_ playerControlsView: PlayerControlView, didSlideSlider value:Float)
+    func PlayerControlsViewDidTapClose(_ playerControlsView: PlayerControlView)
 }
 
 class PlayerControlView: UIView{
@@ -61,7 +62,7 @@ class PlayerControlView: UIView{
         return button
     }()
     
-    private let playPauseButton: UIButton = {
+     let playPauseButton: UIButton = {
         let button = UIButton()
         button.tintColor = .systemTeal
         let image = UIImage(systemName: "pause", withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .regular))

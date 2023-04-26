@@ -27,19 +27,19 @@ enum BrowseSectionType {
     }
 }
 
-enum State{
+enum State {
     case playlist
     case album
 }
 
-enum SearchResult{
+enum SearchResult {
     case artist(model:Artist)
     case album(model:Album)
     case track(model:AudioTrack)
     case playlist(model:Playlist)
 }
 
-enum HTTPMethod: String{
+enum HTTPMethod: String {
     case GET
     case POST
     case DELETE

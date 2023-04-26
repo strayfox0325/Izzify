@@ -113,7 +113,7 @@ final class APICaller{
         getCurrentUserProfile {[weak self] result in
             switch result{
             case .success(let profile):
-                let urlString = Constants.baseAPIURL + "/users/\(profile.id)/playlists"
+                let urlString = Constants.baseAPIURL + "users/\(profile.id)/playlists"
                 self?.createRequest(with: URL(string: urlString), type: .POST, completion: { baseRequest in
                     var request = baseRequest
                     let json = [
@@ -130,6 +130,7 @@ final class APICaller{
                             let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
                             if let response = result as? [String: Any], response["id"] as? String != nil {
                                 completion(true)
+                                print(result)
                             }else{
                                 print("Failed to get ID")
                                 completion(false)
@@ -146,7 +147,7 @@ final class APICaller{
             }
         }
     }
-
+    
     public func addTrackToPlaylist(track: AudioTrack, playlist: Playlist, completion: @escaping(Bool) -> Void){
         createRequest(
             with: URL(string: Constants.baseAPIURL + "playlists/\(playlist.id)/tracks"),
@@ -181,7 +182,7 @@ final class APICaller{
         }
     }
     
-    public func removeTrackFromPlaylist(track: AudioTrack, playlist: Playlist, completion: @escaping (Bool) -> Void){
+    public func removeTrackFromPlaylist(track: AudioTrack, playlist: Playlist, completion: @escaping (Bool) -> Void) {
         createRequest(
             with: URL(string: Constants.baseAPIURL + "playlists/\(playlist.id)/tracks"),
             type: .DELETE
